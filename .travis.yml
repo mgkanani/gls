@@ -1,0 +1,28 @@
+---
+language: go
+go:
+  - 1.5
+  - 1.6
+  - 1.7
+  - 1.8
+  - 1.9
+  - 1.10
+  - 1.11
+  - 1.12
+  - 1.13
+  - tip
+
+before_install:
+  - go get github.com/mattn/goveralls
+  - go get github.com/axw/gocov/gocov
+  - go get github.com/mattn/goveralls
+  - go get golang.org/x/crypto/nacl/secretbox
+  - go get golang.org/x/tools/cmd/cover
+
+install:
+  #- $HOME/gopath/bin/goveralls -service=travis-ci -repotoken=$COVERALLS_TOKEN
+  - goveralls -service=travis-ci -repotoken=$COVERALLS_TOKEN
+
+script:
+  - go test -race ./...
+  - go test -bench ./...

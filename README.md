@@ -1,5 +1,9 @@
 Goroutine Local storage
 ----
+[![Build Status](https://travis-ci.com/mgkanani/gls.svg?branch=master)](https://travis-ci.com/mgkanani/gls)
+[![Coverage Status](https://coveralls.io/repos/github/mgkanani/gls/badge.svg?branch=master)](https://coveralls.io/github/mgkanani/gls?branch=master)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mgkanani/gls)](https://goreportcard.com/report/github.com/mgkanani/gls)
+[![GoDoc](https://img.shields.io/badge/Godoc-reference-blue.svg)](https://godoc.org/github.com/mgkanani/gls)
 
 Go as a language hides underneath complexities associated with a goroutine from intra-communication to blocking/unblocking it. It provides very minimal control over goroutines. Under these circumstances, goroutine local storage(GLS) pattern is tricky. In most of the scenarios, gls can be avoided. GLS pattern follows implicit communication mechanism and lead to code-complexities. However, in some cases GLS-benefits overweights its cons.
 
@@ -16,4 +20,4 @@ Some experiments have been carried out to verify its safety and more will be add
 Caveats:
 * The solution is leveraging golang's goroutine reuse design hence any change around it may hamper the performance of this Library.
 * Memory requirement: 
-    * Best, Avg cases: 2*pointer-size for every key inserted, Worst-case: 4*pointer-size
+    * Best, Avg cases: `2 * pointer-size` for every key inserted, Worst-case: `4 * pointer-size`
