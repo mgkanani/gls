@@ -38,6 +38,41 @@ Below tests/experiments have been carried out to verify its safety and more can 
 * Memory requirement: 
     * Best, Avg cases: ``2*pointer-size`` for every key inserted, Worst-case: ``4*pointer-size``
 
+
+##### Comparison with Read-Write Mutex:
+This comparison is more between sync.Map vs sync.RWMutex backed map with below scenario:
+ * At the end of goroutine del() is being called ```TestGoRtnReUsageStatsWithDel```
+ * At the end of goroutine del() is not called ```TestGoRtnReUsageStatsWithoutDel```
+
+System configuration:
+* 2 cores (core 2 duo)
+* ~700MB free out of 2GB before below run
+
+```
+$ go test -v ./...
+
+...
+=== RUN   TestGoRtnReUsageStatsWithoutDel
+time taken:  54.613740896s
+--- PASS: TestGoRtnReUsageStatsWithoutDel (58.23s)
+=== RUN   TestGoRtnReUsageStatsWithDel
+time taken:  1m4.368832589s
+--- PASS: TestGoRtnReUsageStatsWithDel (65.30s)
+PASS
+ok  	_/home/mahendra/gls/gls	127.688s
+
+...
+=== RUN   TestGoRtnReUsageStatsWithoutDel
+time taken:  2m48.679818646s
+--- PASS: TestGoRtnReUsageStatsWithoutDel (172.72s)
+=== RUN   TestGoRtnReUsageStatsWithDel
+time taken:  2m2.05179381s
+--- PASS: TestGoRtnReUsageStatsWithDel (124.25s)
+PASS
+ok  	_/home/mahendra/gls/gls/rwmutex	302.087s
+```
+
+
 #### Supportability:
 
 The library have been tested only on below architectures. However, it can work in other as well.

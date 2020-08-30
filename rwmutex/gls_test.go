@@ -2,19 +2,23 @@ package rwmutex
 
 import (
 	"fmt"
-	"runtime"
 	"sync"
 	"testing"
 	"time"
 )
 
+const (
+	start = 4
+	end   = 44
+
+	goRtnTotal = 100 * 1000
+)
+
 func getSetDel(group *sync.WaitGroup) {
-	for i := 4; i < 32; i++ {
+	for i := start; i < end-1; i++ {
 		if i&3 == 0 { // multiple of 4
 			Set(i)
 			continue
-		} else if i&(i+1) == 0 {
-			Del()
 		} else {
 			val := Get().(int)
 			if val >= i {
@@ -22,11 +26,12 @@ func getSetDel(group *sync.WaitGroup) {
 			}
 		}
 	}
+	Del()
 	group.Done()
 }
 
 func getSet(group *sync.WaitGroup) {
-	for i := 4; i < 44; i++ {
+	for i := start; i < end; i++ {
 		if i&3 == 0 { // multiple of 4
 			Set(i)
 			continue
@@ -42,9 +47,8 @@ func getSet(group *sync.WaitGroup) {
 
 func TestSet(t *testing.T) {
 	wg := &sync.WaitGroup{}
-	goRtns := 100 * 1000
-	wg.Add(goRtns)
-	for i := 0; i < goRtns; i++ {
+	wg.Add(goRtnTotal)
+	for i := 0; i < goRtnTotal; i++ {
 		go getSetDel(wg)
 	}
 	wg.Wait()
@@ -77,23 +81,44 @@ func BenchmarkSetGet(b *testing.B) {
 	wg.Wait()
 }
 
-// TestSetGet1 validates memory not increasing over the time.
-// It also prints total time it took for GetSet(10-Set,30-Get ops) for 10^5 go-routines.
-func TestSetGet1(t *testing.T) {
-	mStat := &runtime.MemStats{}
-	goRtns := 100 * 1000
-	for i := 0; i < 100; i++ {
-		wg := &sync.WaitGroup{}
-		st := time.Now()
-		wg.Add(goRtns)
-		for i := 0; i < goRtns; i++ {
+func TestGoRtnReUsageStatsWithoutDel(t *testing.T) {
+	wg := &sync.WaitGroup{}
+	//warm-up map
+	wg.Add(goRtnTotal)
+	for i := 0; i < goRtnTotal; i++ {
+		go getSet(wg)
+	}
+	wg.Wait()
+
+	// test and measure time
+	startTime := time.Now()
+	for j := 0; j < 50; j++ {
+		wg.Add(goRtnTotal)
+		for i := 0; i < goRtnTotal; i++ {
 			go getSet(wg)
 		}
 		wg.Wait()
-
-		runtime.ReadMemStats(mStat)
-		fmt.Println(time.Now().Sub(st), mStat.Alloc>>20)
-		<-time.After(200 * time.Millisecond)
 	}
+	fmt.Println("time taken: ", time.Now().Sub(startTime))
+}
 
+func TestGoRtnReUsageStatsWithDel(t *testing.T) {
+	wg := &sync.WaitGroup{}
+	//warm-up map
+	wg.Add(goRtnTotal)
+	for i := 0; i < goRtnTotal; i++ {
+		go getSetDel(wg)
+	}
+	wg.Wait()
+
+	// test and measure time
+	startTime := time.Now()
+	for j := 0; j < 50; j++ {
+		wg.Add(goRtnTotal)
+		for i := 0; i < goRtnTotal; i++ {
+			go getSetDel(wg)
+		}
+		wg.Wait()
+	}
+	fmt.Println("time taken: ", time.Now().Sub(startTime))
 }
