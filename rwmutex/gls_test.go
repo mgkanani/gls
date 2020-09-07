@@ -90,16 +90,25 @@ func TestGoRtnReUsageStatsWithoutDel(t *testing.T) {
 	}
 	wg.Wait()
 
+	iterations := 50
+	samples := make([]time.Duration, iterations)
 	// test and measure time
 	startTime := time.Now()
-	for j := 0; j < 50; j++ {
+	for j := 0; j < iterations; j++ {
+		st := time.Now()
 		wg.Add(goRtnTotal)
 		for i := 0; i < goRtnTotal; i++ {
 			go getSet(wg)
 		}
 		wg.Wait()
+		samples[j] = time.Now().Sub(st)
 	}
-	fmt.Println("time taken: ", time.Now().Sub(startTime))
+
+	total := time.Now().Sub(startTime)
+	min, max, avg := minMaxAvg(samples)
+	fmt.Printf("Min:%v, Max:%v, Avg:%v\n", min, max, (time.Duration)(avg))
+
+	fmt.Println("time taken: ", total)
 }
 
 func TestGoRtnReUsageStatsWithDel(t *testing.T) {
@@ -111,14 +120,37 @@ func TestGoRtnReUsageStatsWithDel(t *testing.T) {
 	}
 	wg.Wait()
 
+	iterations := 50
+	samples := make([]time.Duration, iterations)
 	// test and measure time
 	startTime := time.Now()
-	for j := 0; j < 50; j++ {
+	for j := 0; j < iterations; j++ {
+		st := time.Now()
 		wg.Add(goRtnTotal)
 		for i := 0; i < goRtnTotal; i++ {
 			go getSetDel(wg)
 		}
 		wg.Wait()
+		samples[j] = time.Now().Sub(st)
 	}
-	fmt.Println("time taken: ", time.Now().Sub(startTime))
+
+	total := time.Now().Sub(startTime)
+	min, max, avg := minMaxAvg(samples)
+	fmt.Printf("Min:%v, Max:%v, Avg:%v\n", min, max, (time.Duration)(avg))
+
+	fmt.Println("time taken: ", total)
+}
+
+func minMaxAvg(samples []time.Duration) (time.Duration, time.Duration, int64) {
+	min, max, avg := samples[0], samples[0], samples[0]
+	for i := 1; i < len(samples); i++ {
+		if min > samples[i] {
+			min = samples[i]
+		}
+		if max < samples[i] {
+			max = samples[i]
+		}
+		avg += samples[i]
+	}
+	return min, max, ((int64)(avg)) / ((int64)(len(samples)))
 }

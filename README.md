@@ -29,7 +29,7 @@ map stabilises and read-write are atomically performed without locking.
 
 Below tests/experiments have been carried out to verify its safety and more can be added:
 * Obvious validating and coverage tests
-* Memory usage pattern over the time where goroutines(fix-numbered) continuously using GLS —> validates goroutine reuse design[Caveats-1], validates memory is not continuously increasing. 
+* Memory usage pattern over the time where goroutines(fix-numbered) continuously using GLS —> validates goroutine reuse design(i.e. Caveats-1), validates memory is not continuously increasing. 
 * Long running(1 week) tests and verify memory usage //todo
 
 ##### Caveats:
@@ -40,10 +40,12 @@ Below tests/experiments have been carried out to verify its safety and more can 
 
 
 ##### Comparison with Read-Write Mutex:
-This comparison is more between sync.Map vs sync.RWMutex backed map with below scenario:
+This comparison is more between sync.Map vs sync.RWMutex backed map for gls pattern with below scenario:
  * At the end of goroutine del() is being called ```TestGoRtnReUsageStatsWithDel```
  * At the end of goroutine del() is not called ```TestGoRtnReUsageStatsWithoutDel```
 
+At the start of every iteration, 100K go-routines spawned. Each go routine performs 40 Get:Set in ratio 3:1 operations. There are 50 such iterations.
+ 
 System configuration:
 * 2 cores (core 2 duo)
 * ~700MB free out of 2GB before below run
@@ -53,25 +55,30 @@ $ go test -v ./...
 
 ...
 === RUN   TestGoRtnReUsageStatsWithoutDel
-time taken:  54.613740896s
---- PASS: TestGoRtnReUsageStatsWithoutDel (58.23s)
+Min:740.124215ms, Max:2.37434027s, Avg:1.103566728s
+time taken:  55.178477167s
+--- PASS: TestGoRtnReUsageStatsWithoutDel (57.87s)
 === RUN   TestGoRtnReUsageStatsWithDel
-time taken:  1m4.368832589s
---- PASS: TestGoRtnReUsageStatsWithDel (65.30s)
+Min:737.743745ms, Max:2.134757081s, Avg:1.238451248s
+time taken:  1m1.923180247s
+--- PASS: TestGoRtnReUsageStatsWithDel (62.93s)
 PASS
-ok  	_/home/mahendra/gls/gls	127.688s
+ok  	_/home/mahendra/gls/gls	124.513s
 
 ...
 === RUN   TestGoRtnReUsageStatsWithoutDel
-time taken:  2m48.679818646s
---- PASS: TestGoRtnReUsageStatsWithoutDel (172.72s)
+Min:1.410195319s, Max:5.135148053s, Avg:3.359963156s
+time taken:  2m47.998293153s
+--- PASS: TestGoRtnReUsageStatsWithoutDel (172.19s)
 === RUN   TestGoRtnReUsageStatsWithDel
-time taken:  2m2.05179381s
---- PASS: TestGoRtnReUsageStatsWithDel (124.25s)
+Min:1.73240396s, Max:3.50120815s, Avg:2.423918734s
+time taken:  2m1.196079057s
+--- PASS: TestGoRtnReUsageStatsWithDel (123.50s)
 PASS
 ok  	_/home/mahendra/gls/gls/rwmutex	302.087s
 ```
 
+From above data, it is clear that gls is performing best and takes less than half-time compared to ReadWriteMutex based approach.
 
 #### Supportability:
 
