@@ -16,6 +16,15 @@ const (
 	goRtnTotal = 100 * 1000
 )
 
+func TestSetNil(t *testing.T) {
+	Set(1)
+	Set(nil)
+	val := Get()
+	if val != nil {
+		panic("invalid")
+	}
+}
+
 func getSetDel(group *sync.WaitGroup) {
 	for i := start; i < end-1; i++ {
 		if i&3 == 0 { // multiple of 4

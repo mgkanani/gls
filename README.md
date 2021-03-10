@@ -15,6 +15,24 @@ However, in some cases GLS-benefits overweight their cons.
 
 There have been certain push from many folks to provide GLS with standard golang packages.
 Later, core golang developers decided not to provide GLS with standard golang packages.
+### How to use
+```go
+package xyz
+
+import "github.com/mgkanani/gls"
+
+// to store context/data into gls-store
+    gls.Set(ctx)
+
+    
+    // to retrieve context/data from gls-store
+    ctx := gls.Get()
+    // ctx is of type interface{}, need to be verified against nil and type casted
+    
+    // To propagate ctx/data across go-routines, pass ctx along with other values into channel.
+    // Just before sending ctx into channel, ensure invoking 'gls.Set(nil)'. 
+    // Otherwise it can lead to race conditions for ctx.
+```
 
 #### Under the hood
 

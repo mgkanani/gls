@@ -1,7 +1,7 @@
 package rwmutex
 
 import (
-	"github.com/mgkanani/goroutines"
+	"github.com/mgkanani/gls/goroutines"
 	"runtime"
 	"sync"
 	"unsafe"

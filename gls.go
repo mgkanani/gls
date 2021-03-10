@@ -3,7 +3,7 @@
 package gls
 
 import (
-	"github.com/mgkanani/goroutines"
+	"github.com/mgkanani/gls/goroutines"
 	"runtime"
 	"sync"
 )
@@ -12,7 +12,7 @@ const factor = 10
 
 var (
 	shards = runtime.GOMAXPROCS(-1) * 2 // will be executed at load time.
-	// most of the time, number of core are 2^x, but can be different due to virtualisation/containerisation
+	// most of the time, number of core are 2^x, but can be different due to virtualization/containerisation
 	// bitwise AND can be used when shards is 2^x.
 	// division = shards - 1
 	glsArr = make([]sync.Map, shards)
