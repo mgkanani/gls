@@ -22,6 +22,7 @@ stages:
         customCommand: 'fmt'
         arguments: './...'
   - job: coverage
+    dependsOn: fmt
     displayName: "coverage"
     pool:
       vmImage: ubuntu-latest
@@ -42,8 +43,10 @@ stages:
       env:
         CODECOV_TOKEN: $(CODECOV_TOKEN)
   - job: go_unit_tests
+    dependsOn: coverage
     displayName: "unit tests"
     strategy:
+      maxParallel: 1
       matrix:
         linux_amd64 1.16:
           goVersion: '1.16'
