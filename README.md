@@ -1,6 +1,9 @@
 Goroutine Local storage
 ----
-[![Build Status](https://travis-ci.com/mgkanani/gls.svg?branch=master)](https://travis-ci.com/mgkanani/gls)
+<!--
+[![Build Status](https://travis-ci.com/mgkanani/gls.svg?branch=master)](https://travis-ci.com/mgkanani/gls) 
+-->
+[![Build Status](https://circleci.com/gh/mgkanani/gls.svg?style=svg&branch=master)](https://app.circleci.com/pipelines/github/mgkanani/gls?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/mgkanani/gls/badge.svg?branch=master)](https://coveralls.io/github/mgkanani/gls?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/mgkanani/gls)](https://goreportcard.com/report/github.com/mgkanani/gls)
 [![GoDoc](https://img.shields.io/badge/Godoc-reference-blue.svg)](https://godoc.org/github.com/mgkanani/gls)
