@@ -14,7 +14,7 @@ jobs:
   test:
     working_directory: /go/src/github.com/mgkanani/gls
     docker:
-      - image: circleci/golang:1.12
+      - image: circleci/golang:latest
     steps:
       - checkout
       - run:
@@ -32,6 +32,6 @@ workflows:
 #      - build
       - test
 
-#notify:
-#  webhooks:
-#    - url: https://coveralls.io/webhook?repo_token=${process.env.COVERALLS_REPO_TOKEN}
+notify:
+  webhooks:
+    - url: https://coveralls.io/webhook?repo_token=${process.env.COVERALLS_REPO_TOKEN}
