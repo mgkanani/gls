@@ -21,7 +21,7 @@ jobs:
           name: run test
           command: |
             go get -v -t -d ./...
-            GO111MODULE=off go get github.com/mattn/goveralls
+            go get github.com/mattn/goveralls
             go test -v -cover -coverprofile=coverage.out
             $GOPATH/bin/goveralls -coverprofile=coverage.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
 
@@ -32,6 +32,6 @@ workflows:
 #      - build
       - test
 
-#notify:
-#  webhooks:
-#    - url: https://coveralls.io/webhook?repo_token=${process.env.COVERALLS_REPO_TOKEN}
+notify:
+ webhooks:
+   - url: https://coveralls.io/webhook?repo_token=${process.env.COVERALLS_REPO_TOKEN}

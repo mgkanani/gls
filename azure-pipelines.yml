@@ -1,0 +1,95 @@
+trigger:
+- master
+
+stages:
+- stage: run_checks
+  displayName: "Check"
+  dependsOn: []
+  jobs:
+  - job: fmt
+    displayName: "fmt"
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - task: GoTool@0
+      displayName: "Install Go 1.16"
+      inputs:
+        version: "1.16"
+    - task: Go@0
+      displayName: "go fmt ./..."
+      inputs:
+        command: 'custom'
+        customCommand: 'fmt'
+        arguments: './...'
+  - job: coverage
+    dependsOn: fmt
+    displayName: "coverage"
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - task: GoTool@0
+      displayName: "Install Go 1.16"
+      inputs:
+        version: "1.16"
+    - task: Go@0
+      displayName: "Generate coverage"
+      inputs:
+        command: 'test'
+        arguments: "-race -coverprofile=coverage.txt -covermode=atomic"
+    - task: Bash@3
+      inputs:
+        targetType: 'inline'
+        script: 'bash <(curl -s https://codecov.io/bash) -t ${CODECOV_TOKEN}'
+      env:
+        CODECOV_TOKEN: $(CODECOV_TOKEN)
+  - job: go_unit_tests
+    dependsOn: coverage
+    displayName: "unit tests"
+    strategy:
+      maxParallel: 1
+      matrix:
+        linux_amd64 1.16:
+          goVersion: '1.16'
+          imageName: 'ubuntu-latest'
+          GOOS: linux
+          GOARCH: amd64
+        mac_amd64 1.16:
+          goVersion: '1.16'
+          imageName: 'macOS-latest'
+          GOOS: darwin
+          GOARCH: amd64
+        windows_amd64 1.16:
+          goVersion: '1.16'
+          imageName: 'windows-latest'
+          GOOS: windows
+          GOARCH: amd64
+        linux_amd64 1.9:
+          goVersion: '1.9'
+          imageName: 'ubuntu-latest'
+          GOOS: linux
+          GOARCH: amd64
+        mac_amd64 1.9:
+          goVersion: '1.9'
+          imageName: 'macOS-latest'
+          GOOS: darwin
+          GOARCH: amd64
+        windows_amd64 1.9:
+          goVersion: '1.9'
+          imageName: 'windows-latest'
+          GOOS: windows
+          GOARCH: amd64
+    pool:
+      vmImage: $(imageName)
+    steps:
+    - task: GoTool@0
+      displayName: "Install Go $(goVersion)"
+      inputs:
+        version: $(goVersion)
+    - task: Go@0
+      displayName: "go test ./..."
+      inputs:
+        command: 'test'
+        arguments: './...'
+      env:
+        go.goos: $(GOOS)
+        go.goarch: $(GOARCH)
