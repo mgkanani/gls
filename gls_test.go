@@ -16,6 +16,13 @@ const (
 	goRtnTotal = 100 * 1000
 )
 
+func TestGetNil(t *testing.T) {
+	val := Get()
+	if val != nil {
+		panic("invalid scenario")
+	}
+}
+
 func TestSetNil(t *testing.T) {
 	Set(1)
 	Set(nil)
@@ -63,13 +70,6 @@ func TestSet(t *testing.T) {
 		go getSetDel(wg)
 	}
 	wg.Wait()
-}
-
-func TestGet(t *testing.T) {
-	val := Get()
-	if val != nil {
-		panic("invalid scenario")
-	}
 }
 
 func BenchmarkSetGetDel(b *testing.B) {

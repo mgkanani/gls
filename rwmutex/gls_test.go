@@ -14,6 +14,13 @@ const (
 	goRtnTotal = 100 * 1000
 )
 
+func TestGetNil(t *testing.T) {
+	val := Get()
+	if val != nil {
+		panic("invalid scenario")
+	}
+}
+
 func getSetDel(group *sync.WaitGroup) {
 	for i := start; i < end-1; i++ {
 		if i&3 == 0 { // multiple of 4
@@ -52,13 +59,6 @@ func TestSet(t *testing.T) {
 		go getSetDel(wg)
 	}
 	wg.Wait()
-}
-
-func TestGet(t *testing.T) {
-	val := Get()
-	if val != nil {
-		panic("invalid scenario")
-	}
 }
 
 func BenchmarkSetGetDel(b *testing.B) {
